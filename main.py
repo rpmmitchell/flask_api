@@ -10,7 +10,7 @@ api = Api(app)
 class Users(Resource):
     #To do: hook this data up to mongoDB and retrieve from DB rather than local csv file
     def get(self):
-        data = pd.read_csv('users.csv')
+        data = pd.read_csv('./data/users.csv')
         data = data.to_dict()
         return {'data':data}, 200
 
@@ -32,7 +32,7 @@ class Users(Resource):
         })
 
         # Read our CSV
-        data = pd.read_csv('users.csv')
+        data = pd.read_csv('./data/users.csv')
 
         if args['userId'] in list(data['userId']):
             return {
@@ -42,7 +42,7 @@ class Users(Resource):
             # Add the new values
             data = data.append(new_data, ignore_index=True)
             # Save back to CSV
-            data.to_csv('users.csv', index=False)
+            data.to_csv('./data/users.csv', index=False)
             return {'data': data.to_dict()}, 200
     def put(self):
         parser = reqparse.RequestParser()
@@ -50,7 +50,7 @@ class Users(Resource):
         parser.add_argument('location', required=True)
         args = parser.parse_args()  # parse arguments to dictionary
 
-        data = pd.read_csv('users.csv')
+        data = pd.read_csv('./data/users.csv')
         #What is this truly doing?
         if args['userId'] in list(data['userId']):
             data['locations'] = data['locations'].apply(
@@ -63,7 +63,7 @@ class Users(Resource):
             user_data['locations'] = user_data['locations'].values[0].append(args['location'])
 
             #save back to csv
-            data.to_csv('users.csv', index=False)
+            data.to_csv('./data/users.csv', index=False)
             return {'data': data.to_dict()}, 200
         else:
             return {
@@ -74,14 +74,14 @@ class Users(Resource):
         parser.add_argument('userId', required=True)  # add args
         args = parser.parse_args()  # parse arguments to dictionary
 
-        data = pd.read_csv('users.csv')
+        data = pd.read_csv('./data/users.csv')
         #What is this truly doing?
         if args['userId'] in list(data['userId']):
             #Select our user
             data = data[data['userId'] != args['userId']]
 
             #save back to csv
-            data.to_csv('users.csv', index=False)
+            data.to_csv('./data/users.csv', index=False)
             return {'data': data.to_dict()}, 200
         else:
             return {
@@ -96,7 +96,7 @@ class Users(Resource):
         args = parser.parse_args()  # parse arguments to dictionary
 
         # read our CSV
-        data = pd.read_csv('users.csv')
+        data = pd.read_csv('./data/users.csv')
         # check that the location exists
         if args['userId'] in list(data['userId']):
             # if it exists, we can update it, first we get user row
@@ -111,7 +111,7 @@ class Users(Resource):
             # update data
             data[data['userId'] == args['userId']] = user_data
             # now save updated data
-            data.to_csv('user.csv', index=False)
+            data.to_csv('./data/user.csv', index=False)
             # return data and 200 OK
             return {'data': data.to_dict()}, 200
 
