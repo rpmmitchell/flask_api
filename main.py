@@ -88,6 +88,40 @@ class Users(Resource):
                 'message': f"'{args['userId']}' user not found"
             }, 404
 
+    def patch(self):
+        parser = reqparse.RequestParser()  # initialize parser
+        parser.add_argument('userId', required=True)  # add args
+        parser.add_argument('name', store_missing=False)  # name/rating are optional
+        parser.add_argument('city', store_missing=False)
+        args = parser.parse_args()  # parse arguments to dictionary
+
+        # read our CSV
+        data = pd.read_csv('users.csv')
+        # check that the location exists
+        if args['userId'] in list(data['userId']):
+            # if it exists, we can update it, first we get user row
+            user_data = data[data['userId'] == args['userId']]
+            # if name has been provided, we update name
+            if 'name' in args:
+                user_data['name'] = args['name']
+            # if rating has been provided, we update rating
+            if 'city' in args:
+                user_data['city'] = args['city']
+
+            # update data
+            data[data['userId'] == args['userId']] = user_data
+            # now save updated data
+            data.to_csv('user.csv', index=False)
+            # return data and 200 OK
+            return {'data': data.to_dict()}, 200
+
+        else:
+            # otherwise we return 404 not found
+            return {
+                       'message': f"'{args['userId']}' user does not exist."
+                   }, 404
+
+
 #Locations endpoint
 class Locations(Resource):
     def get(self):
